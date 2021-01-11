@@ -62,9 +62,14 @@ module "elb_api" {
   project_prefix = local.project_prefix
   instance_ids  = [module.api_server.instance_id]
   subnet_ids    = [module.main_vpc.public_subnet_id]
+  vpc_id        = module.main_vpc.vpc_id
 }
 
 
 output "elb_api_dns" {
   value = module.elb_api.elb_api_dns
+}
+
+output "bastion_public_ip" {
+  value = module.bastion_server.instance_public_ip
 }

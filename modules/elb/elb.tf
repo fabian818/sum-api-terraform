@@ -1,6 +1,37 @@
+resource "aws_security_group" "elb_sg" {
+  name        = "${var.project_prefix}-elb-sg"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+
+    Name = "${var.project_prefix}-elb-sg"
+  }
+}
+
+resource "aws_security_group_rule" "sg_rule" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.elb_sg.id
+}
 resource "aws_elb" "elb_api" {
   name               = "${var.project_prefix}-elb-api"
   subnets = var.subnet_ids
+  security_groups = [aws_security_group.elb_sg.id]
 
   listener {
     instance_port     = 80
